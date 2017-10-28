@@ -19,12 +19,12 @@ void setup()   {
 #define D_NUM 47
 
 void loop() {
-  
+  drawIntro();
+}
+
+void drawIntro() {
   display.clearDisplay();
-  
-  // set text color / Textfarbe setzen
   display.setTextColor(WHITE);
-  // set text size / Textgroesse setzen
   display.setTextSize(2);
   display.setCursor(36,6);
   display.println("SNAKE");
@@ -34,12 +34,10 @@ void loop() {
   display.display();
   delay(8000);
   display.clearDisplay();
-  // invert the display / Display invertieren
   display.invertDisplay(true);
   delay(2000); 
   display.invertDisplay(false);
   delay(1000); 
-  
 }
 
 
