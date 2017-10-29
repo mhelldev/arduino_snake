@@ -2,6 +2,9 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <QueueList.h>
+#include "point.h"
+ 
 
 #define OLED_RESET 4 // not used / nicht genutzt bei diesem Display
 Adafruit_SSD1306 display(OLED_RESET);
@@ -11,13 +14,12 @@ int buttonState = 0;
 int currentPositionX = 0;
 int currentPositionY = 0;
 int currentDirection = 0;
+Point p1;
 
 void setup()   {        
-          
   Serial.begin(9600);  
   // initialize with the I2C addr 0x3C / mit I2C-Adresse 0x3c initialisieren
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  
   // random start seed / zufälligen Startwert für Random-Funtionen initialisieren
   randomSeed(analogRead(0));
 
@@ -34,12 +36,11 @@ void setup()   {
 #define D_NUM 47
 
 void loop() {
+  refreshDirection();
   refreshPosition();
 }
 
 void refreshPosition() {
-
-  buttonState = digitalRead(buttonPin);
   Serial.println(buttonState);
   
   display.clearDisplay();
@@ -72,6 +73,10 @@ void refreshPosition() {
   display.drawPixel(currentPositionX,currentPositionY, WHITE);
   display.display();
   delay(100);
+}
+
+void refreshDirection() {
+  buttonState = digitalRead(buttonPin);
 }
 
 void drawIntro() {
