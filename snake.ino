@@ -9,6 +9,8 @@
 #define OLED_RESET 4 // not used / nicht genutzt bei diesem Display
 Adafruit_SSD1306 display(OLED_RESET);
 
+const int MONITOR_WIDTH = 128;
+const int MONITOR_HEIGHT = 32;
 const int buttonPin = 2; 
 int lastButtonState = 0; 
 int currentPositionX = 0;
@@ -24,8 +26,8 @@ void setup()   {
   randomSeed(analogRead(0));
 
   //drawIntro();
-  currentPositionX = random(64);
-  currentPositionY = random(32);
+  currentPositionX = random(MONITOR_WIDTH);
+  currentPositionY = random(MONITOR_HEIGHT);
   currentDirection = random(0,3);
 
   // initialize the pushbutton pin as an input:
@@ -48,25 +50,25 @@ void refreshPosition() {
       currentPositionY--;
       break;
     case 1:
-      currentPositionX++;
+      currentPositionX+=2;
       break;
     case 2:
       currentPositionY++;
       break;
     case 3:
-      currentPositionX--;
+      currentPositionX-=2;
       break;
   }
   if (currentPositionY < 0) {
-    currentPositionY = 32;
+    currentPositionY = MONITOR_HEIGHT;
   }
-  if (currentPositionY > 32) {
+  if (currentPositionY > MONITOR_HEIGHT) {
     currentPositionY = 0;
   }
   if (currentPositionX < 0) {
-    currentPositionX = 64;
+    currentPositionX = MONITOR_WIDTH;
   }
-  if (currentPositionX > 64) {
+  if (currentPositionX > MONITOR_WIDTH) {
     currentPositionX = 0;
   }
   display.drawPixel(currentPositionX,currentPositionY, WHITE);
