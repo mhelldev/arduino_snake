@@ -10,7 +10,7 @@
 Adafruit_SSD1306 display(OLED_RESET);
 
 const int buttonPin = 2; 
-int buttonState = 0; 
+int lastButtonState = 0; 
 int currentPositionX = 0;
 int currentPositionY = 0;
 int currentDirection = 0;
@@ -41,7 +41,6 @@ void loop() {
 }
 
 void refreshPosition() {
-  Serial.println(buttonState);
   
   display.clearDisplay();
   switch(currentDirection) {
@@ -76,7 +75,15 @@ void refreshPosition() {
 }
 
 void refreshDirection() {
-  buttonState = digitalRead(buttonPin);
+  int buttonState = digitalRead(buttonPin);
+  if (buttonState == 1 && lastButtonState==0) {
+      currentDirection++;
+      if (currentDirection > 3) {
+        currentDirection = 0;
+      }
+  }
+  lastButtonState = buttonState;
+  
 }
 
 void drawIntro() {
