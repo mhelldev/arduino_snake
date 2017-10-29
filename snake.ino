@@ -20,6 +20,9 @@ short snakeY[200];
 int currentSnakeLength = 1;
 int counter = 0;
 
+int currentAppleX = 0;
+int currentAppleY = 0;
+
 void setup()   {        
   Serial.begin(9600);  
   // initialize with the I2C addr 0x3C / mit I2C-Adresse 0x3c initialisieren
@@ -35,16 +38,45 @@ void setup()   {
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin, INPUT);
   display.clearDisplay();
+
+  generateApple();
 }
 
 void loop() {
-  refreshDirection();
-  refreshPosition();
+  display.clearDisplay();
+  counter++;
+  if (counter > 100) {
+    refreshDirection();
+    refreshPosition();
+    checkAppleCollision();
+    counter = 0;
+  }
+}
+
+
+void generateApple() {
+  currentAppleX = random(MONITOR_WIDTH-10);
+  currentAppleY = random(MONITOR_HEIGHT-5);
+}
+
+void drawApple() {
+  display.fillCircle(currentAppleX, currentAppleY, 1, WHITE);
+  display.display();
+}
+
+void checkAppleCollision() {
+  if (currentPositionX > currentAppleX -2 &&
+      currentPositionX < currentAppleX +2 &&
+      currentPositionY > currentAppleY -2 &&
+      currentPositionY < currentAppleY + 2) {
+        currentSnakeLength++;
+        generateApple();
+      }
 }
 
 void refreshPosition() {
-  display.clearDisplay();
- 
+  
+ drawApple();
   switch(currentDirection) {
     case 0:
       currentPositionY--;
@@ -72,15 +104,6 @@ void refreshPosition() {
     currentPositionX = 0;
   }
 
-  counter++;
-  Serial.println(counter);
-  if (counter >100) {
-    Serial.println("Now");
-    counter = 0;
-    currentSnakeLength++;
-    
-  }
-  
   for (int i=0; i < currentSnakeLength-1; i++) {
       snakeX[i] = snakeX[i+1];
       snakeY[i] = snakeY[i+1];
@@ -93,7 +116,7 @@ void refreshPosition() {
     display.drawPixel(snakeX[i],snakeY[i], WHITE);
   }
   display.display();
-  delay(100);
+  //delay(100);
   
 }
 
