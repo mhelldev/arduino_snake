@@ -1,4 +1,4 @@
-                                                                 #include <SPI.h>
+#include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -19,6 +19,7 @@ short snakeX[200];
 short snakeY[200];
 int currentSnakeLength = 1;
 int counter = 0;
+bool gameRunning = false;
 
 int currentAppleX = 0;
 int currentAppleY = 0;
@@ -30,10 +31,12 @@ void setup()   {
   // random start seed / zufälligen Startwert für Random-Funtionen initialisieren
   randomSeed(analogRead(0));
 
-  //drawIntro();
-  currentPositionX = random(MONITOR_WIDTH);
-  currentPositionY = random(MONITOR_HEIGHT);
+  drawIntro();
+  currentPositionX = MONITOR_WIDTH / 2;
+  currentPositionY = MONITOR_HEIGHT / 2;
   currentDirection = random(0,3);
+  currentSnakeLength = 1;
+  counter = 0;
 
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin, INPUT);
@@ -43,13 +46,16 @@ void setup()   {
 }
 
 void loop() {
-  display.clearDisplay();
-  counter++;
-  if (counter > 100) {
-    refreshDirection();
-    refreshPosition();
-    checkAppleCollision();
-    counter = 0;
+  if (gameRunning) {
+    display.clearDisplay();
+    counter++;
+    if (counter > 100) {
+      refreshDirection();
+      refreshPosition();
+      checkAppleCollision();
+      checkSnakeCollision();
+      counter = 0;
+    }
   }
 }
 
@@ -68,6 +74,22 @@ void drawField() {
   display.drawLine(0, MONITOR_HEIGHT - 1, MONITOR_WIDTH, MONITOR_HEIGHT - 1, WHITE);
   display.drawLine(0, 0, 0, MONITOR_HEIGHT - 1, WHITE);
   display.drawLine(MONITOR_WIDTH - 1, 0, MONITOR_WIDTH - 1, MONITOR_HEIGHT - 1, WHITE);
+}
+
+void checkSnakeCollision() {
+  if (currentPositionY < 0 || 
+      currentPositionY > MONITOR_HEIGHT || 
+      currentPositionX < 0 ||
+      currentPositionX > MONITOR_WIDTH) {
+    gameOver();
+  }
+
+  //for (int i=0; i < currentSnakeLength-1; i++) {
+  //  if (currentPositionX == snakeX[i] &&
+  //      currentPositionY == snakeY[i]) {
+  //    gameOver();
+  //  }
+  //}
 }
 
 void checkAppleCollision() {
@@ -99,18 +121,6 @@ void refreshPosition() {
     case 3:
       currentPositionX-=2;
       break;
-  }
-  if (currentPositionY < 0) {
-    currentPositionY = MONITOR_HEIGHT;
-  }
-  if (currentPositionY > MONITOR_HEIGHT) {
-    currentPositionY = 0;
-  }
-  if (currentPositionX < 0) {
-    currentPositionX = MONITOR_WIDTH;
-  }
-  if (currentPositionX > MONITOR_WIDTH) {
-    currentPositionX = 0;
   }
 
   for (int i=0; i < currentSnakeLength-1; i++) {
@@ -148,15 +158,28 @@ void drawIntro() {
   display.setCursor(36,6);
   display.println("SNAKE");
   display.setTextSize(1);
-  display.setCursor(41,22);
-  display.println("The Game");
+  display.setCursor(22,22);
+  display.println("Press Button...");
   display.display();
-  delay(2000);
-  display.clearDisplay();
-  display.invertDisplay(true);
-  delay(2000); 
-  display.invertDisplay(false);
-  delay(1000); 
+  while(digitalRead(buttonPin) == 0) {
+    // do nothing...
+  }
+  gameRunning = true;
+  
+}
+
+void gameOver() {
+  gameRunning = false;
+  display.setCursor(12,10);
+  display.setTextColor(WHITE);
+  display.setTextSize(2);
+  display.println("GAME OVER");
+  // draw some random pixel / zufaellige Pixel anzeigen
+  for(int i=0;i<100;i++){
+    display.drawPixel(random(MONITOR_WIDTH),random(MONITOR_HEIGHT), WHITE);
+    display.display();
+  }
+  setup();
 }
 
 
