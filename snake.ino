@@ -1,12 +1,11 @@
-#include <SPI.h>
+                                                                 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <QueueList.h>
-#include "point.h"
- 
 
 #define OLED_RESET 4 // not used / nicht genutzt bei diesem Display
+#define DRAW_DELAY 118
+#define D_NUM 47
 Adafruit_SSD1306 display(OLED_RESET);
 
 const int MONITOR_WIDTH = 128;
@@ -16,7 +15,10 @@ int lastButtonState = 0;
 int currentPositionX = 0;
 int currentPositionY = 0;
 int currentDirection = 0;
-Point p1;
+short snakeX[200];
+short snakeY[200];
+int currentSnakeLength = 1;
+int counter = 0;
 
 void setup()   {        
   Serial.begin(9600);  
@@ -32,10 +34,8 @@ void setup()   {
 
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin, INPUT);
+  display.clearDisplay();
 }
-
-#define DRAW_DELAY 118
-#define D_NUM 47
 
 void loop() {
   refreshDirection();
@@ -43,8 +43,8 @@ void loop() {
 }
 
 void refreshPosition() {
-  
   display.clearDisplay();
+ 
   switch(currentDirection) {
     case 0:
       currentPositionY--;
@@ -71,9 +71,30 @@ void refreshPosition() {
   if (currentPositionX > MONITOR_WIDTH) {
     currentPositionX = 0;
   }
-  display.drawPixel(currentPositionX,currentPositionY, WHITE);
+
+  counter++;
+  Serial.println(counter);
+  if (counter >100) {
+    Serial.println("Now");
+    counter = 0;
+    currentSnakeLength++;
+    
+  }
+  
+  for (int i=0; i < currentSnakeLength-1; i++) {
+      snakeX[i] = snakeX[i+1];
+      snakeY[i] = snakeY[i+1];
+  }
+
+  snakeX[currentSnakeLength-1] = currentPositionX;
+  snakeY[currentSnakeLength-1] = currentPositionY;
+  
+  for (int i=0; i < currentSnakeLength; i++) {
+    display.drawPixel(snakeX[i],snakeY[i], WHITE);
+  }
   display.display();
   delay(100);
+  
 }
 
 void refreshDirection() {
