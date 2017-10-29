@@ -61,7 +61,13 @@ void generateApple() {
 
 void drawApple() {
   display.fillCircle(currentAppleX, currentAppleY, 1, WHITE);
-  display.display();
+}
+
+void drawField() {
+  display.drawLine(0, 0, MONITOR_WIDTH, 0, WHITE);
+  display.drawLine(0, MONITOR_HEIGHT - 1, MONITOR_WIDTH, MONITOR_HEIGHT - 1, WHITE);
+  display.drawLine(0, 0, 0, MONITOR_HEIGHT - 1, WHITE);
+  display.drawLine(MONITOR_WIDTH - 1, 0, MONITOR_WIDTH - 1, MONITOR_HEIGHT - 1, WHITE);
 }
 
 void checkAppleCollision() {
@@ -79,6 +85,7 @@ void checkAppleCollision() {
 void refreshPosition() {
   
  drawApple();
+ drawField();
   switch(currentDirection) {
     case 0:
       currentPositionY--;
