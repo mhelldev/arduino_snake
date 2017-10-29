@@ -70,6 +70,8 @@ void checkAppleCollision() {
       currentPositionY > currentAppleY -2 &&
       currentPositionY < currentAppleY + 2) {
         currentSnakeLength++;
+        snakeX[currentSnakeLength-1] = currentPositionX;
+        snakeY[currentSnakeLength-1] = currentPositionY;
         generateApple();
       }
 }
